@@ -1,0 +1,49 @@
+package programs;
+
+import java.io.*;
+import java.net.*;
+
+public class ChatServer {
+    public static void main(String[] args) {
+        final int PORT = 5000;  // You can change this port if needed
+
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server started. Waiting for client connection on port " + PORT + "...");
+
+            // Wait for client to connect
+            Socket socket = serverSocket.accept();
+            System.out.println("Client connected from " + socket.getInetAddress());
+
+            // Set up input and output streams
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.println("Type messages to send to client. Type 'exit' to quit.\n");
+
+            // Communication loop
+            String message;
+            while ((message = in.readLine()) != null) {
+                System.out.println("Client: " + message);
+                if (message.equalsIgnoreCase("exit")) {
+                    System.out.println("Client ended the chat.");
+                    break;
+                }
+
+                System.out.print("Server: ");
+                String reply = consoleInput.readLine();
+                out.println(reply);
+                if (reply.equalsIgnoreCase("exit")) {
+                    System.out.println("Server ended the chat.");
+                    break;
+                }
+            }
+
+            socket.close();
+            System.out.println("Connection closed.");
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
