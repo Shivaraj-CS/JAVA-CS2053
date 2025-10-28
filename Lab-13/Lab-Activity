@@ -1,0 +1,73 @@
+package programs;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class WebsiteInfoViewer {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter a website URL (e.g., https://www.google.com): ");
+        String urlString = sc.nextLine();
+
+        try {
+            // 1️⃣ Create URL object
+            URL url = new URL(urlString);
+
+            // 2️⃣ Open connection to the URL
+            URLConnection connection = url.openConnection();
+
+            // 3️⃣ Connect to the website
+            connection.connect();
+
+            // 4️⃣ Display basic information
+            System.out.println("\n===== Website Information =====");
+            System.out.println("URL: " + url);
+            System.out.println("Protocol: " + url.getProtocol());
+            System.out.println("Content Type: " + connection.getContentType());
+
+            long date = connection.getDate();
+            if (date != 0) {
+                System.out.println("Date: " + new Date(date));
+            } else {
+                System.out.println("Date: Not available");
+            }
+
+            long lastModified = connection.getLastModified();
+            if (lastModified != 0) {
+                System.out.println("Last Modified: " + new Date(lastModified));
+            } else {
+                System.out.println("Last Modified: Not available");
+            }
+
+            int contentLength = connection.getContentLength();
+            if (contentLength != -1) {
+                System.out.println("Content Length: " + contentLength + " bytes");
+            } else {
+                System.out.println("Content Length: Not available");
+            }
+
+            // 5️⃣ Read and show the first few lines of content
+            System.out.println("\n===== First Few Lines of Webpage Content =====");
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream())
+            );
+
+            String line;
+            int count = 0;
+            while ((line = reader.readLine()) != null && count < 10) { // show first 10 lines
+                System.out.println(line);
+                count++;
+            }
+
+            reader.close();
+
+        } catch (MalformedURLException e) {
+            System.out.println("Invalid URL format! Please include http:// or https://");
+        } catch (IOException e) {
+            System.out.println("Error connecting to the website: " + e.getMessage());
+        } finally {
+            sc.close();
+        }
+    }
+}
